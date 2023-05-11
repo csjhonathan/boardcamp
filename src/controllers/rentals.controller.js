@@ -39,35 +39,26 @@ class RentalsController
 			res.sendStatus( 201 );
 
 		} catch ( error ) {
-			console.log( error.message );
 			res.status( 500 ).send( {message:error.message} );
 		}
 	}
 
 	async list( req, res ){
-		const {customerId, gameId} = req.query;
+		const {customerId, gameId, offset, limit, order, desc,  status, startDate} = req.query;
 		
 		try {
 
-			if( customerId ) {
-				const {rows} = await RentalsRepository.listByQuery( customerId, gameId );
-				if( !rows.length ){
-					return res.status( 404 ).send( {message : 'Aluguéis não encontrados'} );
-				}
-				const formatedRentals = rentalsFormater( rows ); 
-				return res.status( 200 ).send( formatedRentals );
-			}
+			const {rows} = await RentalsRepository.list( 
+				customerId, 
+				gameId, 
+				offset, 
+				limit,
+				order,
+				desc,
+				status, 
+				startDate
+			);
 			
-			if( gameId ){
-				const {rows} = await RentalsRepository.listByQuery( customerId, gameId );
-				if( !rows.length ){
-					return res.status( 404 ).send( {message : 'Aluguéis não encontrados'} );
-				}
-				const formatedRentals = rentalsFormater( rows ); 
-				return res.status( 200 ).send( formatedRentals );
-			}
-
-			const {rows} = await RentalsRepository.list( customerId, gameId );
 			const formatedRentals = rentalsFormater( rows );
 			console.table( formatedRentals );
 			res.status( 200 ).send( formatedRentals );
@@ -80,6 +71,7 @@ class RentalsController
 		const {id} = req.params;
 		if( isNaN( id ) ) return res.status( 404 ).send( {message : 'Id inválido!'} );
 		try {
+			
 			const {rows : [rental]} = await RentalsRepository.listByRentalId( id );
 			if( !rental ){
 				return res.status( 404 ).send( {message : 'Aluguel não encontrado!'} );

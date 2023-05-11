@@ -14,9 +14,9 @@ class CustomersControllers
 	}
 
 	async list( req, res ){
-		const {cpf} = req.query;
+		const {cpf, limit, offset, order, desc} = req.query;
 		try {
-			const {rows} = await CustomersRepository.list( cpf );
+			const {rows} = await CustomersRepository.list( cpf, limit, offset, order, desc );
 			res.status( 200 ).send( rows.map( customer => {
 				return  {...customer, birthday : dayjs( customer.birthday ).format( 'YYYY-MM-DD' )};
 			} ) );
@@ -33,7 +33,6 @@ class CustomersControllers
 			if( !customer ) return res.status( 404 ).send( {message : 'Usuário não encontrado'} );
 			res.status( 200 ).send( {...customer, birthday : dayjs( customer.birthday ).format( 'YYYY-MM-DD' )} );
 		} catch ( error ) {
-			console.log( error.message );
 			res.status( 500 ).send( {message : error.message} );
 		}
 	}
@@ -48,7 +47,6 @@ class CustomersControllers
 			await CustomersRepository.update( id , name, phone, cpf, birthday );
 			res.sendStatus( 200 );
 		} catch ( error ) {
-			console.log( error.message );
 			res.status( 500 ).send( {message : error.message} );
 		}
 	}

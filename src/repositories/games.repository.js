@@ -2,15 +2,32 @@ import db from '../database/connection.js';
 
 class GamesRepository
 {
-	list( name ){
+	list( name, limit, offset, order, desc ){
+		const params = [];
+		let query = ' SELECT * FROM games WHERE 1=1';
+
 		if( name ){
-			const query = {
-				text: 'SELECT * FROM games WHERE name ILIKE $1;',
-				values: [`${name}%`],
-			};
-			return db.query( query );
+			params.push( `${name}%` );
+			query += ` AND name ILIKE $${params.length}`;
 		}
-		return db.query( 'SELECT * FROM games' );
+
+		if ( order ) {
+			query += ` ORDER BY "${order}" ${desc ? 'DESC' : 'ASC'}`;
+		}
+		
+		if ( limit ) {
+			params.push( limit );
+			query += ` LIMIT $${params.length}`;
+		}
+		
+		if ( offset ) {
+			params.push( offset );
+			query += ` OFFSET $${params.length}`;
+		}
+		
+		
+
+		return db.query( `${query};`, params );
 	}
 
 	listById( id ){

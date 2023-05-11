@@ -4,9 +4,15 @@ class GamesControllers
 
 {
 	async list( req, res ){
-		const {name} = req.query;
+		const {name, limit, offset, order, desc} = req.query;
 		try {
-			const {rows} = await GamesRepository.list( name );
+			const {rows} = await GamesRepository.list(
+				name, 
+				limit, 
+				offset,
+				order,
+				desc 
+			);
 			res.status( 200 ).send( rows );
 		} catch ( error ) {
 			res.status( 500 ).send( {message : error.message} );
