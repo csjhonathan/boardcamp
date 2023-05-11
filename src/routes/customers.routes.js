@@ -2,6 +2,7 @@ import { Router } from 'express';
 import customersSchema from '../schemas/customer.schema.js';
 import CustomersController from '../controllers/customers.controller.js';
 import customersValidation from '../middlewares/customer.validation.js';
+
 const customersRoute = Router();
 
 customersRoute.post( '/customers', customersValidation( customersSchema ), CustomersController.create );

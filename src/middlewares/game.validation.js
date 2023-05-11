@@ -6,8 +6,8 @@ export default function gameValidation( shcema ){
 		if( error ) return res.status( 400 ).send( {message : error.details.map( er => er.message )} );
 
 		try {
-			const {rows} = await GamesRepository.list( value.name );
-			if( rows.length ) return res.status( 409 ).send( {message : 'Este jogo já está cadastrado!'} );
+			const {rows : [game]} = await GamesRepository.list( value.name );
+			if( game ) return res.status( 409 ).send( {message : 'Este jogo já está cadastrado!'} );
 		} catch ( error ) {
 			return res.status( 500 ).send( {message : error.message} );
 		}

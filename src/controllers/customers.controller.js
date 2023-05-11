@@ -29,9 +29,9 @@ class CustomersControllers
 		const {id} = req.params;
 		if( isNaN( id ) ) return res.status( 404 ).send( {message : 'Usuário não encontrado'} );
 		try {
-			const {rows} = await CustomersRepository.listById( id );
-			if( !rows.length ) return res.status( 404 ).send( {message : 'Usuário não encontrado'} );
-			res.status( 200 ).send( {...rows[0], birthday : dayjs( rows[0].birthday ).format( 'YYYY-MM-DD' )} );
+			const {rows : [customer]} = await CustomersRepository.listById( id );
+			if( !customer ) return res.status( 404 ).send( {message : 'Usuário não encontrado'} );
+			res.status( 200 ).send( {...customer, birthday : dayjs( customer.birthday ).format( 'YYYY-MM-DD' )} );
 		} catch ( error ) {
 			console.log( error.message );
 			res.status( 500 ).send( {message : error.message} );

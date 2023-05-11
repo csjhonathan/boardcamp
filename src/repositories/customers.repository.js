@@ -25,7 +25,6 @@ class CustomersRepository
 				SELECT * FROM customers WHERE id = $1;
 			`, [id] );
 	}
-	
 
 	update( id, name, phone, cpf, birthday ){
 		return db.query( `

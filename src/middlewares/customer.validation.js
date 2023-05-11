@@ -7,19 +7,18 @@ export default function customersValidation( shcema ){
 
 		try {
 
-			const {rows : customer} = await CustomersRepository.list( value.cpf );
+			const {rows : [customer]} = await CustomersRepository.list( value.cpf );
 			
 			if( id && !isNaN( id ) ){
 
-				if( !customer.length ){
+				if( !customer ){
 					res.locals.customer = req.body;
 					return next();
 				}
-				const {rows} = await CustomersRepository.listById( id );
-				if( !rows.length ){
+				const {rows : [customerById]} = await CustomersRepository.listById( id );
+				if( !customerById ){
 					return res.status( 409 ).send( {message : 'Id inexistente!'} );
-				}else if( customer[0]?.id !== Number( id ) ){
-					console.log( rows, customer );
+				}else if( customer.id !== Number( id ) ){
 					return res.status( 409 ).send( {message : 'CPF indisponível!'} );
 				}else{
 					res.locals.customer = req.body;
@@ -27,7 +26,7 @@ export default function customersValidation( shcema ){
 				}
 			}else if( id && isNaN( id ) ) return res.status( 422 ).send( {message : 'Id inválido!'} );
 
-			if( customer.length ) return res.status( 409 ).send( {message : 'Usuário já está cadastrado!'} );
+			if( customer ) return res.status( 409 ).send( {message : 'Usuário já está cadastrado!'} );
 
 			res.locals.customer = req.body;
 			next();
