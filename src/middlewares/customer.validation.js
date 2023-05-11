@@ -10,10 +10,14 @@ export default function customersValidation( shcema ){
 			const {rows : customer} = await CustomersRepository.list( value.cpf );
 			
 			if( id && !isNaN( id ) ){
-				if( !customer.length ) return res.status( 407 ).send( {message : 'Usuário não existe!'} );
+
+				if( !customer.length ){
+					res.locals.customer = req.body;
+					return next();
+				}
 				const {rows} = await CustomersRepository.listById( id );
 				if( !rows.length ){
-					return res.status( 408 ).send( {message : 'Id inexistente!'} );
+					return res.status( 409 ).send( {message : 'Id inexistente!'} );
 				}else if( customer[0]?.id !== Number( id ) ){
 					console.log( rows, customer );
 					return res.status( 409 ).send( {message : 'CPF indisponível!'} );
