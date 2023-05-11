@@ -8,18 +8,22 @@ export default function customersValidation( shcema ){
 
 		try {
 
+			const {rows : customer} = await CustomersRepository.list( value.cpf );
+
 			if( id && !isNaN( id ) ){
+				
 				const {rows} = await CustomersRepository.listById( id );
 				if( !rows.length ){
 					return res.status( 409 ).send( {message : 'Id inexistente!'} );
+				}else if( customer[0]?.id !== Number( id ) ){
+					return res.status( 409 ).send( {message : 'CPF indispoível para uso!'} );
 				}else{
 					res.locals.customer = req.body;
 					return next();
 				}
 			}else if( id && isNaN( id ) ) return res.status( 422 ).send( {message : 'Id inválido!'} );
 
-			const {rows} = await CustomersRepository.list( value.cpf );
-			if( rows.length ) return res.status( 409 ).send( {message : 'Usuário já está cadastrado!'} );
+			if( customer.length ) return res.status( 409 ).send( {message : 'Usuário já está cadastrado!'} );
 
 			res.locals.customer = req.body;
 			next();

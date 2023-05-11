@@ -29,6 +29,7 @@ class CustomersControllers
 
 	async listById( req, res ){
 		const {id} = req.params;
+		if( isNaN( id ) ) return res.status( 404 ).send( {message : 'Usuário não encontrado'} );
 		try {
 			const {rows} = await CustomersRepository.listById( id );
 			res.status( 200 ).send( {...rows[0], birthday : dayjs( rows[0].birthday ).format( 'YYYY-MM-DD' )} );
