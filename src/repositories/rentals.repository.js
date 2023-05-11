@@ -18,7 +18,28 @@ class RentalsRepository
     ` );
 	}
 
-	listById( id ){
+	listByQuery( customerId , gameId ){
+		if( customerId ){
+			return db.query( `
+        SELECT rentals.*, games.name AS "rentedGameName", games.id AS "rentedGameId", customers.name AS "customerName", customers.id AS "rentCustomerId" 
+        FROM rentals 
+        JOIN games ON rentals."gameId" = games.id
+        JOIN customers ON rentals."customerId" = customers.id
+        WHERE "customerId" = $1;    
+    `, [ customerId ] );
+		}
+		if( gameId ){
+			return db.query( `
+        SELECT rentals.*, games.name AS "rentedGameName", games.id AS "rentedGameId", customers.name AS "customerName", customers.id AS "rentCustomerId" 
+        FROM rentals 
+        JOIN games ON rentals."gameId" = games.id
+        JOIN customers ON rentals."customerId" = customers.id
+        WHERE "gameId" = $1;    
+    `, [ gameId ] );
+		}
+	}
+
+	listByRentalId( id ){
 		return db.query( `
       SELECT * FROM rentals WHERE id = $1;
     `,[id] );

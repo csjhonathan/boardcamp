@@ -2,7 +2,7 @@ import GamesRepository from '../repositories/games.repository.js';
 import CustomersRepository from '../repositories/customers.repository.js';
 import RentalsRepository from '../repositories/rentals.repository.js';
 import dayjs from 'dayjs';
-
+import rentalsFormater from '../helpers/rentalsFormater.js';
 class RentalsController
 {
 	async create( req,res ){
@@ -45,32 +45,30 @@ class RentalsController
 	}
 
 	async list( req, res ){
+		const {customerId, gameId} = req.query;
+		
 		try {
-			const {rows} = await RentalsRepository.list();
 
-			const formatedRentals = rows.map( rental => {
-				const formatedRental = {
-					...rental, 
-					customer :  {
-						id : rental.rentCustomerId,
-						name : rental.customerName
-					},
-					game : {
-						id : rental.rentedGameId,
-						name : rental.rentedGameName
-					},
-					rentDate : dayjs( rental.rentDate ).format( 'YYYY-MM-DD' ),
-					returnDate : rental.returnDate ? dayjs( rental.returnDate ).format( 'YYYY-MM-DD' ) : rental.returnDate
-				};
+			if( customerId ) {
+				const {rows} = await RentalsRepository.listByQuery( customerId, gameId );
+				if( !rows.length ){
+					return res.status( 404 ).send( {message : 'Aluguéis não encontrados'} );
+				}
+				const formatedRentals = rentalsFormater( rows ); 
+				return res.status( 200 ).send( formatedRentals );
+			}
 			
-				delete formatedRental.rentedGameName;
-				delete formatedRental.rentedGameId;
-				delete formatedRental.customerName;
-				delete formatedRental.rentCustomerId;
-			
-				return formatedRental;
-				
-			} );
+			if( gameId ){
+				const {rows} = await RentalsRepository.listByQuery( customerId, gameId );
+				if( !rows.length ){
+					return res.status( 404 ).send( {message : 'Aluguéis não encontrados'} );
+				}
+				const formatedRentals = rentalsFormater( rows ); 
+				return res.status( 200 ).send( formatedRentals );
+			}
+
+			const {rows} = await RentalsRepository.list( customerId, gameId );
+			const formatedRentals = rentalsFormater( rows );
 			console.table( formatedRentals );
 			res.status( 200 ).send( formatedRentals );
 		} catch ( error ) {
@@ -82,7 +80,7 @@ class RentalsController
 		const {id} = req.params;
 		if( isNaN( id ) ) return res.status( 404 ).send( {message : 'Id inválido!'} );
 		try {
-			const {rows : [rental]} = await RentalsRepository.listById( id );
+			const {rows : [rental]} = await RentalsRepository.listByRentalId( id );
 			if( !rental ){
 				return res.status( 404 ).send( {message : 'Aluguel não encontrado!'} );
 			}
@@ -105,7 +103,7 @@ class RentalsController
 		if( isNaN( id ) ) return res.status( 404 ).send( {message : 'Id inválido!'} );
 		try {
 
-			const {rows : [rental]} = await RentalsRepository.listById( id );
+			const {rows : [rental]} = await RentalsRepository.listByRentalId( id );
 			if( !rental ){
 				return res.status( 404 ).send( {message : 'Aluguel não encontrado!'} );
 			}
@@ -116,7 +114,7 @@ class RentalsController
 			let delayFee = null;
 			
 			if( dayjs( Date.now() ).diff( rental.rentDate, 'day' ) > rental.daysRented ){
-				delayFee = ( Math.abs( dayjs( Date.now() ).diff( rental.rentDate, 'day' ) ) * rental.originalPrice ) - rental.originalPrice;
+				delayFee = ( Math.abs( dayjs( Date.now() ).diff( rental.rentDate, 'day' ) ) * rental.pricePerDay );
 			}
 			
 			await RentalsRepository.update( id,  dayjs( Date.now() ).format( 'YYYY-MM-DD' ), delayFee );
