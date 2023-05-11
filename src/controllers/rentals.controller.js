@@ -20,7 +20,7 @@ class RentalsController
 				return res.status( 400 ).send( {message : 'Jogo ou usuário não encontrado!'} );
 			}
 
-			if( !game.stockTotal ) {
+			if( game.stockTotal == 0 ) {
 				return res.status( 400 ).send( {message : 'Jogo indisponível para aluguel!'} );
 			}
 
@@ -114,9 +114,13 @@ class RentalsController
 			let delayFee = null;
 			
 			if( dayjs( Date.now() ).diff( rental.rentDate, 'day' ) > rental.daysRented ){
-				delayFee = ( Math.abs( dayjs( Date.now() ).diff( rental.rentDate, 'day' ) ) * rental.pricePerDay );
+
+				const pricePerDay = rental.originalPrice / rental.daysRented;
+				const delay = Math.abs( dayjs( Date.now() ).diff( rental.rentDate, 'day' ) - rental.daysRented );
+
+				delayFee = delay * pricePerDay;
 			}
-			
+
 			await RentalsRepository.update( id,  dayjs( Date.now() ).format( 'YYYY-MM-DD' ), delayFee );
 			await GamesRepository.update( 1, rental.gameId );
 			res.sendStatus( 200 );
