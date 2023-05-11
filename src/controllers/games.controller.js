@@ -9,7 +9,7 @@ class GamesControllers
 			const {rows} = await GamesRepository.list( name );
 			res.status( 200 ).send( rows );
 		} catch ( error ) {
-			res.sendStatus( 500 );
+			res.status( 500 ).send( {message : error.message} );
 		}
 	}
 	async create( req, res ){
@@ -18,7 +18,7 @@ class GamesControllers
 			await GamesRepository.create( name, image, stockTotal, pricePerDay );
 			res.sendStatus( 201 );
 		} catch ( error ) {
-			res.sendStatus( 500 );
+			res.status( 500 ).send( {message : error.message} );
 		}
 	}
 }

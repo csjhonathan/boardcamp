@@ -9,8 +9,7 @@ class CustomersControllers
 			await CustomersRepository.create( name, phone, cpf, birthday );
 			res.sendStatus( 201 );
 		} catch ( error ) {
-			console.log( error.message );
-			res.sendStatus( 500 );
+			res.status( 500 ).send( {message : error.message} );
 		}
 	}
 
@@ -22,8 +21,7 @@ class CustomersControllers
 				return  {...customer, birthday : dayjs( customer.birthday ).format( 'YYYY-MM-DD' )};
 			} ) );
 		} catch ( error ) {
-			console.log( error.message );
-			res.sendStatus( 500 );
+			res.status( 500 ).send( {message : error.message} );
 		}
 	}
 
@@ -32,10 +30,11 @@ class CustomersControllers
 		if( isNaN( id ) ) return res.status( 404 ).send( {message : 'Usuário não encontrado'} );
 		try {
 			const {rows} = await CustomersRepository.listById( id );
+			if( !rows.length ) return res.status( 404 ).send( {message : 'Usuário não encontrado'} );
 			res.status( 200 ).send( {...rows[0], birthday : dayjs( rows[0].birthday ).format( 'YYYY-MM-DD' )} );
 		} catch ( error ) {
 			console.log( error.message );
-			res.sendStatus( 500 );
+			res.status( 500 ).send( {message : error.message} );
 		}
 	}
 
@@ -50,7 +49,7 @@ class CustomersControllers
 			res.sendStatus( 200 );
 		} catch ( error ) {
 			console.log( error.message );
-			res.sendStatus( 500 );
+			res.status( 500 ).send( {message : error.message} );
 		}
 	}
 }

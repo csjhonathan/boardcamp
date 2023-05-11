@@ -9,7 +9,7 @@ export default function gameValidation( shcema ){
 			const {rows} = await GamesRepository.list( value.name );
 			if( rows.length ) return res.status( 409 ).send( {message : 'Este jogo já está cadastrado!'} );
 		} catch ( error ) {
-			return res.sendStatus( 500 );
+			return res.status( 500 ).send( {message : error.message} );
 		}
 
 		res.locals.game = value;
