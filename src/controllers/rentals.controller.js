@@ -120,6 +120,7 @@ class RentalsController
 			}
 			
 			await RentalsRepository.update( id,  dayjs( Date.now() ).format( 'YYYY-MM-DD' ), delayFee );
+			await GamesRepository.update( 1, rental.gameId );
 			res.sendStatus( 200 );
 		} catch ( error ) {
 			res.status( 500 ).send( {message:error.message} );
