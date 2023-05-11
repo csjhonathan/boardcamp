@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import GamesControllers from '../controllers/games.controller.js';
-import gameValidation from '../middlewares/game.schema.validation.js';
-import gameSchema from '../schemas/games.schema.js';
-const gamesRouter = Router();
+import gameValidation from '../middlewares/game.validation.js';
+import gameSchema from '../schemas/game.schema.js';
+const gamesRoute = Router();
 
-gamesRouter.get( '/games', GamesControllers.list );
-gamesRouter.post( '/games', gameValidation( gameSchema ) ,GamesControllers.create );
+gamesRoute.get( '/games', GamesControllers.list );
+gamesRoute.post( '/games', gameValidation( gameSchema ) , GamesControllers.create );
 
 
-export default gamesRouter;
+export default gamesRoute;

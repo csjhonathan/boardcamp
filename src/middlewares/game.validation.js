@@ -2,7 +2,7 @@ import GamesRepository from '../repositories/games.repository.js';
 export default function gameValidation( shcema ){
 	return async ( req, res, next ) => {
 		const {error, value} = shcema.validate( req.body, {abortEarly : false} );
-
+		
 		if( error ) return res.status( 400 ).send( {message : error.details.map( er => er.message )} );
 
 		try {

@@ -10,6 +10,7 @@ class GamesRepository
 			};
 			return db.query( query );
 		}
+		return db.query( 'SELECT * FROM games' );
 	}
 
 	create( name, image, stockTotal, pricePerDay ){

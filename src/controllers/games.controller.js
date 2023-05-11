@@ -7,10 +7,8 @@ class GamesControllers
 		const {name} = req.query;
 		try {
 			const {rows} = await GamesRepository.list( name );
-			console.table( rows );
 			res.status( 200 ).send( rows );
 		} catch ( error ) {
-			console.log( error.message );
 			res.sendStatus( 500 );
 		}
 	}
@@ -20,7 +18,6 @@ class GamesControllers
 			await GamesRepository.create( name, image, stockTotal, pricePerDay );
 			res.sendStatus( 201 );
 		} catch ( error ) {
-			console.log( error.message );
 			res.sendStatus( 500 );
 		}
 	}

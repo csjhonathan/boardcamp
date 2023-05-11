@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import gamesRouter from './games.routes.js';
+import gamesRoute from './games.routes.js';
+import customerRoute from './customers.routes.js';
 
 const routes = Router();
 
-routes.use( gamesRouter );
+routes.use( gamesRoute );
+routes.use( customerRoute );
 
 export default routes;
