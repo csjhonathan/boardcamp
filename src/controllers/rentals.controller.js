@@ -9,18 +9,19 @@ class RentalsController
 		const {customerId, gameId, daysRented} = req.body;
 
 		if( isNaN( customerId ) || isNaN( gameId ) || isNaN( daysRented ) ){
-			return res.status( 400 ).send( {message : 'Todos os campos devem ser apenas números inteiros!'} );
+			return res.status( 400 ).send( {message : 'Todos os campos devem ser números inteiros!'} );
 		}
 		if( daysRented <= 0 ) return res.status( 400 ).send( {message : 'A quantidade de dias alugado deve ser maior que 0!'} );
 		try {
 
 			const {rows : [customer]} = await CustomersRepository.listById( customerId );
 			const {rows : [game]} = await GamesRepository.listById( gameId );
+
 			if( !customer || !game ){
 				return res.status( 400 ).send( {message : 'Jogo ou usuário não encontrado!'} );
 			}
 
-			if( game.stockTotal == 0 ) {
+			if( Number( game.stockTotal ) <= 0 ) {
 				return res.status( 400 ).send( {message : 'Jogo indisponível para aluguel!'} );
 			}
 
@@ -60,7 +61,7 @@ class RentalsController
 			);
 			
 			const formatedRentals = rentalsFormater( rows );
-			console.table( formatedRentals );
+
 			res.status( 200 ).send( formatedRentals );
 		} catch ( error ) {
 			res.status( 500 ).send( {message:error.message} );
