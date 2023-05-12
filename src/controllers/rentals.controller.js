@@ -16,12 +16,13 @@ class RentalsController
 
 			const {rows : [customer]} = await CustomersRepository.listById( customerId );
 			const {rows : [game]} = await GamesRepository.listById( gameId );
-
+			const {rows : rentals } = await RentalsRepository.list( null , null, null, null, null,	null, 'open', null );
+			
 			if( !customer || !game ){
 				return res.status( 400 ).send( {message : 'Jogo ou usuário não encontrado!'} );
 			}
 
-			if( Number( game.stockTotal ) <= 0 ) {
+			if(  rentals.length >= game.stockTotal ) {
 				return res.status( 400 ).send( {message : 'Jogo indisponível para aluguel!'} );
 			}
 
@@ -34,8 +35,6 @@ class RentalsController
 				daysRented * game.pricePerDay,
 				null
 			);
-			
-			await GamesRepository.update( -1, gameId );
 
 			res.sendStatus( 201 );
 
@@ -115,7 +114,6 @@ class RentalsController
 			}
 
 			await RentalsRepository.update( id,  dayjs( Date.now() ).format( 'YYYY-MM-DD' ), delayFee );
-			await GamesRepository.update( 1, rental.gameId );
 			res.sendStatus( 200 );
 		} catch ( error ) {
 			res.status( 500 ).send( {message:error.message} );
