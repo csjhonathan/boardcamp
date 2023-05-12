@@ -6,9 +6,13 @@ dotenv.config();
 
 const{ Pool } = pg;
 
-const db = new Pool( {
+const configDatabase = {
 	connectionString: process.env.DATABASE_URL
-} );
+};
+
+if( process.env.MODE ) configDatabase.ssl = true;
+
+const db = new Pool( configDatabase );
 
 try {
 	await db.connect();
@@ -16,4 +20,5 @@ try {
 } catch ( err ) {
 	console.error( chalk.red( 'DB CONNECTION FAILED' ), err );
 }
+
 export default db;
