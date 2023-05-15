@@ -1,7 +1,6 @@
 import GamesRepository from '../repositories/games.repository.js';
 
 class GamesControllers
-
 {
 	async list( req, res ){
 		const {name, limit, offset, order, desc} = req.query;
@@ -18,6 +17,7 @@ class GamesControllers
 			res.status( 500 ).send( {message : error.message} );
 		}
 	}
+	
 	async create( req, res ){
 		const {name, image, stockTotal, pricePerDay} = res.locals.game;
 		try {

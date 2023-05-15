@@ -3,8 +3,10 @@ import CustomersRepository from '../repositories/customers.repository.js';
 import RentalsRepository from '../repositories/rentals.repository.js';
 import dayjs from 'dayjs';
 import rentalsFormater from '../helpers/rentalsFormater.js';
+
 class RentalsController
 {
+	
 	async create( req,res ){
 		const {customerId, gameId, daysRented} = req.body;
 
@@ -16,7 +18,7 @@ class RentalsController
 
 			const {rows : [customer]} = await CustomersRepository.listById( customerId );
 			const {rows : [game]} = await GamesRepository.listById( gameId );
-			const {rows : rentals } = await RentalsRepository.list( null , null, null, null, null,	null, 'open', null );
+			const {rows : rentals } = await RentalsRepository.list( {status : 'open'} );
 			
 			if( !customer || !game ){
 				return res.status( 400 ).send( {message : 'Jogo ou usuário não encontrado!'} );
@@ -45,10 +47,9 @@ class RentalsController
 
 	async list( req, res ){
 		const {customerId, gameId, offset, limit, order, desc,  status, startDate} = req.query;
-		
 		try {
 
-			const {rows} = await RentalsRepository.list( 
+			const {rows} = await RentalsRepository.list( {
 				customerId, 
 				gameId, 
 				offset, 
@@ -57,7 +58,7 @@ class RentalsController
 				desc,
 				status, 
 				startDate
-			);
+			} );
 			
 			const formatedRentals = rentalsFormater( rows );
 
@@ -103,12 +104,13 @@ class RentalsController
 				return res.status( 400 ).send( {message : 'Não foi possível devolver pois o aluguel já está fechado!'} );
 			}
 
+			const totalDays = dayjs( Date.now() ).diff( rental.rentDate, 'day' );
 			let delayFee = null;
 			
-			if( dayjs( Date.now() ).diff( rental.rentDate, 'day' ) > rental.daysRented ){
+			if( totalDays > rental.daysRented ){
 
 				const pricePerDay = rental.originalPrice / rental.daysRented;
-				const delay = Math.abs( dayjs( Date.now() ).diff( rental.rentDate, 'day' ) - rental.daysRented );
+				const delay = Math.abs( totalDays - rental.daysRented );
 
 				delayFee = delay * pricePerDay;
 			}

@@ -1,14 +1,17 @@
 import CustomersRepository from '../repositories/customers.repository.js';
 import dayjs from 'dayjs';
+
 class CustomersControllers
 {
 	async create( req, res ){
 		const {name, phone, cpf, birthday} = res.locals.customer;
+
 		try {
 
 			await CustomersRepository.create( name, phone, cpf, birthday );
 			res.sendStatus( 201 );
 		} catch ( error ) {
+
 			res.status( 500 ).send( {message : error.message} );
 		}
 	}

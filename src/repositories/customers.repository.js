@@ -1,4 +1,5 @@
 import db from '../database/connection.js';
+import customerQuery from '../helpers/customerQueryConstructor.js';
 
 class CustomersRepository
 {
@@ -6,32 +7,11 @@ class CustomersRepository
 		return db.query( `
 			INSERT INTO customers (name, phone, cpf, birthday)
 			VALUES ($1, $2, $3, $4);
-		`, [name, phone, Number( cpf ), birthday] );
+		`, [name, phone,  cpf , birthday] );
 	}
 
 	list( cpf, limit, offset, order, desc ){
-		const params = [];
-		let query = 'SELECT * FROM customers WHERE 1=1';
-
-		if( cpf ){
-			params.push( `${cpf}%` );
-			query += `AND cpf LIKE $${params.length}`;
-		}
-
-		if( order ){
-			query+= ` ORDER BY "${order}" ${desc? 'DESC' : 'ASC'}`;
-		}
-
-		if( limit ){
-			params.push( limit );
-			query += ` LIMIT $${params.length}`;
-		}
-
-		if( offset ){
-			params.push( offset );
-			query += ` OFFSET $${params.length}`;
-		}
-
+		const {query, params} = customerQuery( cpf, limit, offset, order, desc );
 		return db.query( `${query};`, params );
 	}
 
